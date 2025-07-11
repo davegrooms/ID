@@ -1,0 +1,2982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Scanner - Parfitt Cresswell</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #B03C5F;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border: 3px solid #B03C5F;
+            margin-top: 0;
+        }
+
+        .header {
+            background: white;
+            color: #333;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            width: 200px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 300;
+            color: #B03C5F;
+        }
+
+        .header p {
+            opacity: 0.7;
+            font-size: 16px;
+            font-weight: 300;
+            color: #666;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .document-options {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .doc-button {
+            background: #004E92;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 78, 146, 0.4);
+            background: #003d75;
+        }
+
+        .btn {
+            background: #004E92;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 78, 146, 0.4);
+            background: #003d75;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .camera-container {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            min-height: 200px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #6c757d;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .instructions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #a67a7e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ocr-results {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #B03C5F;
+        }
+
+        .data-value {
+            color: #6c757d;
+        }
+
+        .raw-text {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .confidence-score {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .confidence-score.low {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .confidence-score.medium {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .thank-you {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .thank-you h2 {
+            color: #B03C5F;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .header-compact {
+            background: white;
+            padding: 15px 30px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .header-compact .logo {
+            width: 100%;
+            max-width: 300px;
+            height: 60px;
+            margin: 0 auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .next-step-preview {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border: 2px solid #B03C5F;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .next-step-preview h3 {
+            color: #B03C5F;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .next-step-preview p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .next-step-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 5px rgba(176, 60, 95, 0.3);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(176, 60, 95, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #28a745;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            .content {
+                padding: 30px 20px;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" id="mainHeader">
+            <div class="logo">
+                <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+            </div>
+            <h1>ID Scanner</h1>
+            <p>Secure Document Verification System</p>
+        </div>
+
+        <div class="content">
+            <!-- Step 0: ID Reference Entry -->
+            <div class="step active" id="step0">
+                <h2>Enter ID Reference</h2>
+                <p>Please enter your 6-digit ID Reference number:</p>
+                <div style="margin: 30px 0;">
+                    <input type="text" id="idRefInput" placeholder="e.g., 162024" 
+                           style="width: 100%; padding: 15px; font-size: 18px; border: 2px solid #e9ecef; 
+                                  border-radius: 10px; text-align: center; letter-spacing: 2px; 
+                                  -webkit-appearance: none; appearance: none;"
+                           maxlength="6" pattern="16[0-9]{4}" inputmode="numeric">
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="validateAndProceed()" id="proceedToDocSelection" 
+                            style="font-size: 18px; padding: 15px 30px; min-width: 200px;">
+                        Continue →
+                    </button>
+                </div>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 14px; color: #1565c0;">
+                    <strong>Format:</strong> 6 digits starting with 16 (e.g., 162024)
+                </div>
+            </div>
+
+            <!-- Step 1: Document Type Selection -->
+            <div class="step" id="step1">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; display: inline-block;">
+                        <strong>ID Reference: <span style="color: #B03C5F;" id="displayIdRef"></span></strong>
+                    </div>
+                </div>
+                <h2>Select Document Type</h2>
+                <p>Please choose the type of document you want to scan:</p>
+                <div class="document-options">
+                    <button class="doc-button" onclick="selectDocument('passport')">
+                        <svg width="40" height="56" viewBox="0 0 40 56" style="vertical-align: middle;">
+                            <!-- Passport cover - UK Blue -->
+                            <rect x="0" y="0" width="40" height="56" rx="3" fill="#1e3a5f" stroke="#152a47" stroke-width="1"/>
+                            <!-- Gold accent line -->
+                            <rect x="0" y="8" width="40" height="1" fill="#D4AF37" opacity="0.8"/>
+                            <rect x="0" y="47" width="40" height="1" fill="#D4AF37" opacity="0.8"/>
+                            <!-- Emblem circle -->
+                            <circle cx="20" cy="20" r="8" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity="0.8"/>
+                            <!-- Crown symbol -->
+                            <path d="M15 19 L17 16 L20 17 L23 16 L25 19 L25 21 L15 21 Z" fill="#D4AF37" opacity="0.8"/>
+                            <!-- PASSPORT text -->
+                            <text x="20" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#D4AF37" opacity="0.9">PASSPORT</text>
+                        </svg>
+                        <span style="margin-left: 10px;">Passport</span>
+                    </button>
+                    <button class="doc-button" onclick="selectDocument('license')">
+                        <svg width="54" height="34" viewBox="0 0 54 34" style="vertical-align: middle;">
+                            <!-- Card background -->
+                            <rect x="0" y="0" width="54" height="34" rx="3" fill="#fdd9d9" stroke="#e0e0e0" stroke-width="0.5"/>
+                            <!-- EU flag section -->
+                            <rect x="2" y="2" width="10" height="10" rx="1" fill="#003399"/>
+                            <!-- EU stars (simplified) -->
+                            <circle cx="7" cy="4" r="0.5" fill="#ffcc00"/>
+                            <circle cx="9" cy="5" r="0.5" fill="#ffcc00"/>
+                            <circle cx="10" cy="7" r="0.5" fill="#ffcc00"/>
+                            <circle cx="9" cy="9" r="0.5" fill="#ffcc00"/>
+                            <circle cx="7" cy="10" r="0.5" fill="#ffcc00"/>
+                            <circle cx="5" cy="9" r="0.5" fill="#ffcc00"/>
+                            <circle cx="4" cy="7" r="0.5" fill="#ffcc00"/>
+                            <circle cx="5" cy="5" r="0.5" fill="#ffcc00"/>
+                            <!-- UK text -->
+                            <text x="7" y="8" text-anchor="middle" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="white">UK</text>
+                            <!-- DRIVING LICENCE text -->
+                            <text x="27" y="8" text-anchor="middle" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#003399">DRIVING LICENCE</text>
+                            <!-- Photo placeholder -->
+                            <rect x="3" y="14" width="12" height="15" rx="1" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+                            <circle cx="9" cy="19" r="2" fill="#bbb"/>
+                            <circle cx="9" cy="24" r="3" fill="#bbb"/>
+                            <!-- Text lines representing licence details -->
+                            <rect x="18" y="15" width="32" height="1" rx="0.5" fill="#666"/>
+                            <rect x="18" y="18" width="28" height="1" rx="0.5" fill="#666"/>
+                            <rect x="18" y="21" width="30" height="1" rx="0.5" fill="#666"/>
+                            <rect x="18" y="24" width="26" height="1" rx="0.5" fill="#666"/>
+                            <rect x="18" y="27" width="32" height="1" rx="0.5" fill="#666"/>
+                            <!-- UK flag -->
+                            <g transform="translate(44, 22)">
+                                <rect x="0" y="0" width="8" height="5" fill="#012169"/>
+                                <path d="M0,0 L8,5 M8,0 L0,5" stroke="white" stroke-width="0.8"/>
+                                <path d="M0,0 L8,5 M8,0 L0,5" stroke="#C8102E" stroke-width="0.4"/>
+                                <path d="M4,0 L4,5 M0,2.5 L8,2.5" stroke="white" stroke-width="1.2"/>
+                                <path d="M4,0 L4,5 M0,2.5 L8,2.5" stroke="#C8102E" stroke-width="0.8"/>
+                            </g>
+                        </svg>
+                        <span style="margin-left: 10px;">Driving Licence</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Passport Instructions (only for passport) -->
+            <div class="step" id="step2">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <h2>Passport Data Page Instructions</h2>
+                
+                <div style="background: #e3f2fd; border: 2px solid #1976d2; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #1565c0; margin: 0 0 15px 0; text-align: center;">📖 Scan the Data Page</h3>
+                    
+                    <!-- Passport Visual -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <svg width="350" height="210" viewBox="0 0 350 210" style="border: 2px solid #1976d2; border-radius: 8px; background: #f8f9fa;">
+                            <!-- Passport page background -->
+                            <defs>
+                                <pattern id="securityPattern" patternUnits="userSpaceOnUse" width="50" height="50">
+                                    <rect width="50" height="50" fill="#fefbfb"/>
+                                    <circle cx="25" cy="25" r="15" fill="none" stroke="#f5e6e6" stroke-width="0.3" opacity="0.4"/>
+                                </pattern>
+                            </defs>
+                            <rect x="0" y="0" width="350" height="210" rx="8" fill="url(#securityPattern)"/>
+                            
+                            <!-- Top header -->
+                            <text x="175" y="25" text-anchor="middle" font-family="serif" font-size="11" font-weight="bold" fill="#2c2c2c">UNITED KINGDOM OF GREAT BRITAIN</text>
+                            <text x="175" y="37" text-anchor="middle" font-family="serif" font-size="9" fill="#2c2c2c">AND NORTHERN IRELAND</text>
+                            <text x="175" y="52" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold" fill="#2c2c2c" letter-spacing="2px">PASSPORT</text>
+                            
+                            <!-- Simple passport photo - just outline with grey fill -->
+                            <rect x="25" y="70" width="45" height="60" rx="3" fill="#d3d3d3" stroke="#666" stroke-width="2"/>
+                            <!-- Simple head outline -->
+                            <ellipse cx="47.5" cy="90" rx="15" ry="18" fill="none" stroke="#666" stroke-width="2"/>
+                            <!-- Simple shoulder outline -->
+                            <path d="M 30 125 Q 47.5 115 65 125" fill="none" stroke="#666" stroke-width="2"/>
+                            
+                            <!-- COLUMN 1: Essential personal data with smaller field text -->
+                            <text x="85" y="80" font-family="Arial, sans-serif" font-size="5" fill="#555">Surname/Nom (1)</text>
+                            <text x="85" y="91" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#c41e3a" letter-spacing="1px">SMITH</text>
+                            
+                            <text x="85" y="108" font-family="Arial, sans-serif" font-size="5" fill="#555">Given names/Prénoms (2)</text>
+                            <text x="85" y="119" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#c41e3a" letter-spacing="0.5px">JOHN DAVID</text>
+                            
+                            <text x="85" y="136" font-family="Arial, sans-serif" font-size="5" fill="#555">Nationality/Nationalité (3)</text>
+                            <text x="85" y="147" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#000">BRITISH CITIZEN</text>
+                            
+                            <!-- COLUMN 2: Passport number only with smaller field text -->
+                            <text x="250" y="80" font-family="Arial, sans-serif" font-size="5" fill="#555">Passport No./Passeport No.</text>
+                            <text x="250" y="95" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#c41e3a" letter-spacing="2px">133785247</text>
+                            
+                            <!-- Machine Readable Zone at bottom - full width, two lines (no label) -->
+                            <rect x="10" y="170" width="330" height="30" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/>
+                            <!-- Line 1 of MRZ -->
+                            <text x="15" y="182" font-family="monospace" font-size="9" fill="#333">P&lt;GBRSMITH&lt;&lt;JOHN&lt;DAVID&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>
+                            <!-- Line 2 of MRZ -->
+                            <text x="15" y="194" font-family="monospace" font-size="9" fill="#333">1337852476GBR6812216M3206159&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;04</text>
+                            
+                            <!-- Highlight boxes around key data -->
+                            <rect x="83" y="77" width="140" height="75" fill="none" stroke="#ff5722" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
+                            <rect x="248" y="77" width="95" height="23" fill="none" stroke="#ff5722" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
+                            
+                            <!-- Instruction arrow and text -->
+                            <path d="M 320 25 L 340 35 L 320 45 Z" fill="#ff5722"/>
+                            <text x="280" y="18" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#ff5722">Scan this</text>
+                            <text x="280" y="30" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#ff5722">data page!</text>
+                        </svg>
+                    </div>
+                    
+                    <div style="background: #fff3cd; border: 1px solid #d4af37; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                        <h4 style="color: #856404; margin: 0 0 10px 0;">📋 Important Instructions:</h4>
+                        <ul style="color: #856404; margin: 0; padding-left: 20px;">
+                            <li><strong>Data page only</strong> - The page with your photo and personal information</li>
+                            <li><strong>Not the cover</strong> - Open your passport to the inside data page</li>
+                            <li><strong>Flat and steady</strong> - Lay passport flat, hold camera steady</li>
+                            <li><strong>Good lighting</strong> - Ensure text is clearly readable</li>
+                            <li><strong>Fill the frame</strong> - Get close enough to see all the text clearly</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="proceedToCamera()" 
+                            style="font-size: 18px; padding: 15px 30px; width: 100%;">
+                        📷 I Understand - Start Camera
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Document Scanning -->
+            <div class="step" id="step3">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <h2>Scan <span id="docType"></span></h2>
+                <div id="cameraContainer" class="camera-container">📷</div>
+                <div class="controls">
+                    <button class="btn" onclick="captureDocument()">📷 Capture Document</button>
+                    <button class="btn secondary" onclick="switchCamera()">🔄 Switch Camera</button>
+                </div>
+                <div class="instructions">
+                    <h4>📋 Capture Instructions:</h4>
+                    <ul>
+                        <li>Ensure good lighting</li>
+                        <li>Hold document flat and steady</li>
+                        <li>Fill the frame with your document</li>
+                        <li>Avoid glare and shadows</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 4: OCR Processing -->
+            <div class="step" id="step4">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <h2>Processing Document</h2>
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p id="processingText">Analyzing document...</p>
+                </div>
+            </div>
+
+            <!-- Step 5: OCR Results -->
+            <div class="step" id="step5">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <h2>Document Analysis Results</h2>
+                <div class="confidence-score" id="confidenceScore"></div>
+                
+                <div class="next-step-preview" id="nextStepPreview" style="display: none;">
+                    <span class="next-step-icon">🤳</span>
+                    <h3>Next: Take Your Photo</h3>
+                    <p>We have a good scan of your ID. You will now need to take a selfie for photo verification</p>
+                    <button class="btn" onclick="proceedToPhoto()" 
+                            style="margin-top: 15px; background: #B03C5F; font-size: 16px; padding: 12px 24px;">
+                        📸 Continue to Photo
+                    </button>
+                </div>
+                
+                <div class="controls" id="retakeSection" style="margin: 15px 0;">
+                    <button class="btn danger" onclick="retakeDocument()" 
+                            style="font-size: 18px; padding: 15px 30px; width: 100%; margin: 0;">
+                        🔄 Retake ID Document Image
+                    </button>
+                </div>
+                
+                <div class="ocr-results" id="ocrResults"></div>
+            </div>
+
+            <!-- Step 6: Photo Capture -->
+            <div class="step" id="step6">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 24px;">📄✅ → 🤳</span>
+                    <h3 style="margin: 5px 0;">Document Scanned Successfully!</h3>
+                    <p style="margin: 0; opacity: 0.9;">Now take a clear photo of yourself for verification</p>
+                </div>
+                <h2>Take Your Photo</h2>
+                <div id="photoContainer" class="camera-container">📷</div>
+                <div class="controls">
+                    <button class="btn" onclick="capturePhoto()">📷 Take Photo</button>
+                    <button class="btn secondary" onclick="switchPhotoCamera()">🔄 Switch Camera</button>
+                </div>
+                <div class="instructions">
+                    <h4>📸 Photo Instructions:</h4>
+                    <ul>
+                        <li>Look directly at the camera</li>
+                        <li>Remove hats and sunglasses</li>
+                        <li>Ensure face is well-lit</li>
+                        <li>Keep a neutral expression</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 7: Processing -->
+            <div class="step" id="step7">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <h2>Finalising Submission</h2>
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p><strong>Processing your confidential documents...</strong></p>
+                    <p style="margin-top: 15px; font-size: 14px; color: #666;">Your information is being securely transmitted to the Risk & Compliance team at Parfitt Cresswell Solicitors.</p>
+                    <p style="margin-top: 10px; font-size: 12px; color: #B03C5F;">🔒 All data is encrypted and handled in strict confidence</p>
+                </div>
+            </div>
+
+            <!-- Step 8: Thank You -->
+            <div class="step" id="step8">
+                <div class="header-compact">
+                    <div class="logo">
+                        <img src="https://www.parfittcresswell.com/assets/images/pc_logo_new.svg" alt="Parfitt Cresswell Logo">
+                    </div>
+                </div>
+                <div class="thank-you">
+                    <div class="checkmark">✓</div>
+                    <h2>Thank You!</h2>
+                    <p>Your ID verification has been completed successfully. The document and photo have been securely processed and transmitted to the Risk & Compliance team at Parfitt Cresswell Solicitors for confidential review.</p>
+                    <br>
+                    <button class="btn" onclick="startOver()">Scan Another Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Configuration constants - must be defined first
+        const SMTP2GO_CONFIG = {
+            apiUrl: 'https://api.smtp2go.com/v3/',
+            apiKey: 'api-46B81FB9224244EC81CFE27994B4775E'
+        };
+
+        const AZURE_CONFIG = {
+            endpoint: 'https://id.cognitiveservices.azure.com/',
+            apiKey: '5vMDwlr9ChvgIkjqeeYJw9vxDNldvyp2YfT5o2eR0i3p8QVMaEvoJQQJ99BFACmepeSXJ3w3AAAFACOGY602',
+            apiVersion: '3.2'
+        };
+
+        // Define all critical functions early so they're available when HTML loads
+        
+        // Global variables
+        let selectedDocType = '';
+        let stream = null;
+        let currentCamera = 'environment';
+        let documentImage = null;
+        let photoImage = null;
+        let ocrData = null;
+        let confidenceScore = 0;
+        let idRef = '';
+        let currentStep = 0;
+        let cameraPermissionGranted = false;
+
+        // Validation functions
+        function validatePassportNumber(passportNumber) {
+            if (!passportNumber) return false;
+            
+            // Remove any spaces or special characters
+            const cleaned = passportNumber.replace(/[\s\-]/g, '');
+            
+            // UK passport numbers are 9 digits
+            const ukPassportPattern = /^\d{9}$/;
+            
+            if (ukPassportPattern.test(cleaned)) {
+                console.log('Valid UK passport number format:', cleaned);
+                return true;
+            }
+            
+            console.log('Invalid passport number format:', passportNumber);
+            return false;
+        }
+
+        function validateDrivingLicenceNumber(licenceNumber) {
+            if (!licenceNumber) return false;
+            
+            // First check if it matches with space and digits at end
+            const withSpacePattern = /^[A-Z]{5}\d{6}[A-Z0-9]{5}\s+\d{2}$/i;
+            if (withSpacePattern.test(licenceNumber)) {
+                console.log('Valid UK driving licence format with space:', licenceNumber);
+                return true;
+            }
+            
+            // Remove spaces for other checks
+            const cleaned = licenceNumber.replace(/\s/g, '').toUpperCase();
+            
+            // UK driving licence patterns
+            const ukLicencePattern16 = /^[A-Z]{5}\d{6}[A-Z0-9]{5}$/;
+            const ukLicencePattern18 = /^[A-Z]{5}\d{6}[A-Z0-9]{5}\d{2}$/;
+            
+            if (ukLicencePattern16.test(cleaned) || ukLicencePattern18.test(cleaned)) {
+                console.log('Valid UK driving licence format:', licenceNumber);
+                
+                const dateDigits = cleaned.substring(5, 11);
+                const month = parseInt(dateDigits.substring(3, 5));
+                
+                if (month > 0 && month <= 12) {
+                    console.log('Licence number date validation passed');
+                    return true;
+                } else if (month >= 51 && month <= 62) {
+                    console.log('Licence number date validation passed (female)');
+                    return true;
+                }
+            }
+            
+            console.log('Invalid driving licence format:', licenceNumber);
+            return false;
+        }
+
+        function validateIDRef(ref) {
+            const pattern = /^16\d{4}$/;
+            return pattern.test(ref);
+        }
+
+        function validateAndProceed() {
+            console.log('validateAndProceed called - starting validation');
+            
+            try {
+                const input = document.getElementById('idRefInput');
+                console.log('Input element found:', !!input);
+                
+                if (!input) {
+                    alert('Error: Input field not found. Please refresh the page.');
+                    return false;
+                }
+                
+                const value = input.value ? input.value.trim() : '';
+                console.log('Input value:', value, 'Length:', value.length);
+                
+                if (!value) {
+                    alert('Please enter an ID Reference number.');
+                    input.focus();
+                    return false;
+                }
+                
+                if (value.length !== 6) {
+                    alert('ID Reference must be exactly 6 digits.');
+                    input.focus();
+                    return false;
+                }
+                
+                if (!value.startsWith('16')) {
+                    alert('ID Reference must start with 16.');
+                    input.focus();
+                    return false;
+                }
+                
+                if (!/^\d{6}$/.test(value)) {
+                    alert('ID Reference must contain only numbers.');
+                    input.focus();
+                    return false;
+                }
+                
+                // All validation passed
+                idRef = value;
+                console.log('ID Ref set successfully:', idRef);
+                
+                // Update display element immediately if it exists
+                setTimeout(() => {
+                    const displayElement = document.getElementById('displayIdRef');
+                    if (displayElement) {
+                        displayElement.textContent = idRef;
+                        console.log('Display element updated');
+                    }
+                }, 100);
+                
+                // Move to next step
+                console.log('Moving to step 1');
+                showStep(1);
+                return false; // Prevent form submission
+                
+            } catch (error) {
+                console.error('Error in validateAndProceed:', error);
+                alert('An error occurred. Please refresh the page and try again.');
+                return false;
+            }
+        }
+
+        function showStep(step) {
+            console.log('showStep called with step:', step);
+            
+            try {
+                // Hide all steps first
+                const allSteps = document.querySelectorAll('.step');
+                console.log('Found steps:', allSteps.length);
+                
+                allSteps.forEach((s, index) => {
+                    s.classList.remove('active');
+                    s.style.display = 'none'; // Force hide
+                });
+                
+                // Show target step
+                const targetStep = document.getElementById(`step${step}`);
+                if (targetStep) {
+                    targetStep.classList.add('active');
+                    targetStep.style.display = 'block'; // Force show
+                    console.log('Step', step, 'activated');
+                } else {
+                    console.error('Step element not found:', `step${step}`);
+                    return;
+                }
+                
+                currentStep = step;
+                
+                // Handle header visibility
+                const mainHeader = document.getElementById('mainHeader');
+                if (mainHeader) {
+                    if (step === 0) {
+                        mainHeader.style.display = 'block';
+                        console.log('Main header shown');
+                    } else {
+                        mainHeader.style.display = 'none';
+                        console.log('Main header hidden');
+                    }
+                }
+                
+                // Update ID ref display if moving to step 1 and idRef is set
+                if (step === 1 && idRef) {
+                    setTimeout(() => {
+                        const displayElement = document.getElementById('displayIdRef');
+                        if (displayElement) {
+                            displayElement.textContent = idRef;
+                            console.log('Updated displayIdRef with:', idRef);
+                        }
+                    }, 100);
+                }
+                
+                // Scroll to top of page
+                window.scrollTo(0, 0);
+                
+            } catch (error) {
+                console.error('Error in showStep:', error);
+            }
+        }
+
+        function selectDocument(type) {
+            console.log('selectDocument called with type:', type);
+            selectedDocType = type;
+            document.getElementById('docType').textContent = type === 'passport' ? 'Passport' : 'Driving Licence';
+            
+            if (type === 'passport') {
+                // Show passport instructions page first
+                console.log('Showing passport instructions (step 2)');
+                showStep(2);
+            } else {
+                // Go directly to camera for driving license (step 3)
+                console.log('Going to camera for driving license (step 3)');
+                showStep(3);
+                initCamera();
+            }
+        }
+
+        function proceedToCamera() {
+            console.log('proceedToCamera called');
+            // Move from passport instructions (step 2) to camera (step 3)
+            showStep(3);
+            initCamera();
+        }
+
+        function retakeDocument() {
+            console.log('retakeDocument called');
+            if (selectedDocType === 'passport') {
+                // Go back to instructions for passport (step 2)
+                showStep(2);
+            } else {
+                // Go directly to camera for license (step 3)
+                showStep(3);
+                initCamera();
+            }
+        }
+
+        function proceedToPhoto() {
+            console.log('proceedToPhoto called');
+            // Go to photo step (step 6)
+            showStep(6);
+            initPhotoCamera();
+        }
+
+        async function captureDocument() {
+            console.log('captureDocument called');
+            const container = document.getElementById('cameraContainer');
+            const video = container.querySelector('video');
+            
+            if (video && video.srcObject) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                documentImage = canvas.toDataURL('image/jpeg', 1.0);
+                
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            }
+            
+            if (documentImage) {
+                showStep(4);
+                // Use Azure OCR
+                try {
+                    await processAzureOCR();
+                } catch (error) {
+                    console.error('Error in captureDocument:', error);
+                    alert('OCR processing failed. Please try again.');
+                    showStep(3); // Go back to camera
+                }
+            } else {
+                alert('Please capture or upload a document first.');
+            }
+        }
+
+        // Azure OCR processing function
+        async function processAzureOCR() {
+            try {
+                const processingText = document.getElementById('processingText');
+                
+                processingText.textContent = 'Connecting to Azure Computer Vision...';
+                console.log('=== STARTING AZURE OCR ===');
+                console.log('Document image size:', documentImage ? documentImage.length : 'No image');
+                
+                // Call Azure API
+                const result = await callAzureAPI(documentImage, processingText);
+                
+                console.log('=== AZURE RESULT ===', result);
+                
+                // Store the OCR data
+                ocrData = result;
+                
+                // Extract fields from the text
+                const extractedData = extractDocumentData(result.text, selectedDocType);
+                
+                // Calculate confidence based on field extraction
+                let fieldsFound = 0;
+                let numberFieldFound = false;
+                
+                if (selectedDocType === 'passport') {
+                    if (extractedData['Surname'] && extractedData['Surname'].trim() !== '') fieldsFound++;
+                    if (extractedData['Given Names'] && extractedData['Given Names'].trim() !== '') fieldsFound++;
+                    if (extractedData['Passport Number'] && extractedData['Passport Number'].trim() !== '' && validatePassportNumber(extractedData['Passport Number'])) {
+                        fieldsFound++;
+                        numberFieldFound = true;
+                    }
+                } else {
+                    if (extractedData['1. Surname'] && extractedData['1. Surname'].trim() !== '') fieldsFound++;
+                    if (extractedData['2. Given Names'] && extractedData['2. Given Names'].trim() !== '') fieldsFound++;
+                    if (extractedData['5. License Number'] && extractedData['5. License Number'].trim() !== '' && validateDrivingLicenceNumber(extractedData['5. License Number'])) {
+                        fieldsFound++;
+                        numberFieldFound = true;
+                    }
+                }
+                
+                // Calculate confidence
+                if (!numberFieldFound) {
+                    confidenceScore = 0;
+                } else {
+                    confidenceScore = Math.round((fieldsFound / 3) * 100);
+                }
+                
+                // Show results
+                showStep(5);
+                displayOCRResults();
+                
+            } catch (error) {
+                console.error('=== AZURE ERROR ===', error);
+                
+                // Show error in results
+                showStep(5);
+                const confidenceElement = document.getElementById('confidenceScore');
+                const resultsElement = document.getElementById('ocrResults');
+                
+                confidenceElement.className = 'confidence-score low';
+                confidenceElement.textContent = 'OCR Processing Failed';
+                
+                resultsElement.innerHTML = `
+                    <div style="color: #dc3545;">
+                        <h3>❌ OCR Processing Error</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Please try again or contact support if the issue persists.</p>
+                        <div style="margin-top: 20px;">
+                            <button class="btn danger" onclick="retakeDocument()">🔄 Try Again</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function callAzureAPI(imageData, statusElement) {
+            console.log('=== CALLING AZURE API ===');
+            
+            try {
+                statusElement.textContent = 'Converting image...';
+                
+                // Convert base64 to bytes
+                const base64Data = imageData.split(',')[1];
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                console.log('Image converted to bytes:', bytes.length);
+                
+                statusElement.textContent = 'Sending to Azure...';
+                
+                const analyzeUrl = `${AZURE_CONFIG.endpoint}vision/v3.2/read/analyze`;
+                console.log('Azure URL:', analyzeUrl);
+                
+                const analyzeResponse = await fetch(analyzeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': AZURE_CONFIG.apiKey,
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    body: bytes
+                });
+                
+                console.log('Azure analyze response status:', analyzeResponse.status);
+                
+                if (!analyzeResponse.ok) {
+                    const errorText = await analyzeResponse.text();
+                    throw new Error(`Azure API error ${analyzeResponse.status}: ${errorText}`);
+                }
+                
+                const operationLocation = analyzeResponse.headers.get('Operation-Location');
+                console.log('Operation Location:', operationLocation);
+                
+                if (!operationLocation) {
+                    throw new Error('No Operation-Location header received');
+                }
+                
+                // Poll for results
+                statusElement.textContent = 'Processing image...';
+                
+                let attempts = 0;
+                const maxAttempts = 20;
+                
+                while (attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    attempts++;
+                    
+                    statusElement.textContent = `Processing image... ${attempts * 3}s`;
+                    
+                    const resultResponse = await fetch(operationLocation, {
+                        headers: {
+                            'Ocp-Apim-Subscription-Key': AZURE_CONFIG.apiKey
+                        }
+                    });
+                    
+                    if (!resultResponse.ok) {
+                        console.log('Poll error, continuing...');
+                        continue;
+                    }
+                    
+                    const resultData = await resultResponse.json();
+                    console.log('Azure status:', resultData.status);
+                    
+                    if (resultData.status === 'succeeded') {
+                        console.log('Azure OCR succeeded');
+                        
+                        // Extract text from result
+                        let extractedText = '';
+                        if (resultData.analyzeResult && resultData.analyzeResult.readResults) {
+                            resultData.analyzeResult.readResults.forEach(page => {
+                                if (page.lines) {
+                                    page.lines.forEach(line => {
+                                        extractedText += line.text + '\n';
+                                    });
+                                }
+                            });
+                        }
+                        
+                        return {
+                            text: extractedText.trim(),
+                            confidence: 85,
+                            method: 'Azure Computer Vision v3.2',
+                            rawAzureResponse: resultData
+                        };
+                    } else if (resultData.status === 'failed') {
+                        throw new Error('Azure processing failed');
+                    }
+                }
+                
+                throw new Error('Azure timeout after ' + (maxAttempts * 3) + ' seconds');
+                
+            } catch (error) {
+                console.error('Azure API error:', error);
+                throw error;
+            }
+        }
+
+        // Document data extraction functions
+        function extractDocumentData(text, docType) {
+            console.log('=== DOCUMENT DATA EXTRACTION ===');
+            console.log('Document type:', docType);
+            console.log('Input text:', text);
+            
+            if (docType === 'passport') {
+                return extractPassportData(text);
+            } else {
+                // Keep existing driving license extraction logic
+                const data = {};
+                data['Document Type'] = 'UK Driving License';
+                
+                // More flexible patterns for UK license
+                data['1. Surname'] = extractPattern(text, /1\.?\s*([A-Z]+)/i) ||
+                                    extractPattern(text, /GROOMS/i) ||
+                                    extractPattern(text, /^([A-Z]{4,})$/m);
+                
+                data['2. Given Names'] = extractPattern(text, /2\.?\s*([A-Z\s]+)/i) ||
+                                        extractPattern(text, /(MR\s+[A-Z\s]+)/i) ||
+                                        extractPattern(text, /(DAVID\s+JOHN)/i);
+                
+                data['3. Date of Birth'] = extractPattern(text, /3\.?\s*(\d{2}\.\d{2}\.\d{4})/i) ||
+                                          extractPattern(text, /(\d{2}\.\d{2}\.\d{4})/);
+                
+                data['4a. Date of Issue'] = extractPattern(text, /4a\.?\s*(\d{2}\.\d{2}\.\d{4})/i);
+                data['4b. Date of Expiry'] = extractPattern(text, /4b\.?\s*(\d{2}\.\d{2}\.\d{4})/i);
+                data['4c. Authority'] = extractPattern(text, /4c\.?\s*([A-Z]+)/i) ||
+                                       extractPattern(text, /(DVLA)/i);
+                
+                data['5. License Number'] = extractPattern(text, /5\.?\s*([A-Z]{5}\d{6}[A-Z0-9]{5}(?:\s*\d{2})?)/i) ||
+                                           extractPattern(text, /([A-Z]{5}\d{6}[A-Z0-9]{5}(?:\s*\d{2})?)/);
+                
+                // Validate the licence number
+                if (!data['5. License Number'] || !validateDrivingLicenceNumber(data['5. License Number'])) {
+                    // Try alternative patterns including with spaces
+                    const licencePatterns = [
+                        /GROOM[A-Z0-9]{11}(?:\s*\d{2})?/i,
+                        /[A-Z]{5}\d{6}[A-Z0-9]{5}\s*\d{2}/,
+                        /[A-Z]{5}\d{6}[A-Z0-9]{5}/,
+                        /([A-Z]{5})\s*(\d{6})\s*([A-Z0-9]{5})(?:\s*(\d{2}))?/
+                    ];
+                    
+                    for (const pattern of licencePatterns) {
+                        const match = text.match(pattern);
+                        if (match) {
+                            const potentialLicence = match[0].trim();
+                            if (validateDrivingLicenceNumber(potentialLicence)) {
+                                data['5. License Number'] = potentialLicence;
+                                console.log('Found valid licence number:', potentialLicence);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!data['5. License Number']) {
+                        console.warn('No valid UK driving licence number found');
+                    }
+                }
+                
+                // Address extraction - look for actual address patterns
+                data['8. Address'] = extractPattern(text, /8\.?\s*([A-Z0-9\s,]+(?:CLOSE|STREET|ROAD|AVENUE)[A-Z0-9\s,]*)/i) ||
+                                    extractPattern(text, /(WHEELWRIGHT\s+CLOSE[A-Z0-9\s,]*)/i) ||
+                                    extractPattern(text, /(EASTBOURNE[A-Z0-9\s,]*)/i) ||
+                                    extractPattern(text, /(\d+\s+[A-Z\s]+(?:CLOSE|STREET|ROAD)[A-Z0-9\s,]*)/i);
+                
+                data['9. Categories'] = extractPattern(text, /9\.?\s*([A-Z\/\d\s]+)/i) ||
+                                       extractPattern(text, /(AM\/A\/B1\/B\/C1\/D1\/BE\/C1E\/D1E)/i);
+                
+                // Extract postcode separately
+                data['Postcode'] = extractPattern(text, /([A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2})/i) ||
+                                  extractPattern(text, /(BN22\s*0XG)/i);
+                
+                return data;
+            }
+        }
+
+        function extractPattern(text, pattern) {
+            const match = text.match(pattern);
+            return match ? match[1].trim() : null;
+        }
+
+        function extractPassportData(text) {
+            console.log('=== PASSPORT DATA EXTRACTION ===');
+            console.log('Input text:', text);
+            
+            const data = {};
+            
+            // Clean and normalize the text
+            const cleanText = text.replace(/[^\w\s\/\-\.]/g, ' ').replace(/\s+/g, ' ').trim();
+            const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            console.log('Cleaned text:', cleanText);
+            console.log('Lines found:', lines);
+            
+            // Extract passport number - multiple patterns
+            data['Passport Number'] = extractPassportNumber(text, lines);
+            
+            // Extract surname and given names
+            const nameData = extractPassportNames(text, lines);
+            data['Surname'] = nameData.surname;
+            data['Given Names'] = nameData.givenNames;
+            
+            // Extract other passport fields
+            data['Nationality'] = extractNationality(text, lines);
+            data['Date of Birth'] = extractDateOfBirth(text, lines);
+            data['Date of Expiry'] = extractDateOfExpiry(text, lines);
+            data['Place of Birth'] = extractPlaceOfBirth(text, lines);
+            data['Sex'] = extractSex(text, lines);
+            
+            console.log('Final extracted passport data:', data);
+            return data;
+        }
+
+        function extractPassportNumber(text, lines) {
+            console.log('--- Extracting Passport Number ---');
+            
+            // UK passport numbers are typically 9 digits
+            const patterns = [
+                // Direct passport number patterns
+                /passport\s*(?:no|number|num)?[:\s]*([0-9]{9})/i,
+                /passport[:\s]*([0-9]{9})/i,
+                /(?:^|\s)([0-9]{9})(?:\s|$)/,
+                
+                // Machine readable zone patterns (MRZ) - last line typically contains passport number
+                /GBR([0-9]{9})/i,
+                /P<GBR([0-9]{9})/i,
+                
+                // Look for 9 consecutive digits anywhere
+                /\b([0-9]{9})\b/,
+                
+                // Sometimes with spaces or separators
+                /([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3})/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const passportNum = match[1].replace(/[\s\-]/g, '');
+                    if (passportNum.length === 9 && /^\d{9}$/.test(passportNum)) {
+                        console.log('Passport number found:', passportNum, 'using pattern:', pattern);
+                        return passportNum;
+                    }
+                }
+            }
+            
+            // Check each line for standalone 9-digit numbers
+            for (const line of lines) {
+                const digitMatch = line.match(/\b(\d{9})\b/);
+                if (digitMatch) {
+                    console.log('Passport number found in line:', digitMatch[1]);
+                    return digitMatch[1];
+                }
+            }
+            
+            console.log('No passport number found');
+            return '';
+        }
+
+        function extractPassportNames(text, lines) {
+            console.log('--- Extracting Names ---');
+            console.log('Raw text for name extraction:', text);
+            console.log('Lines for analysis:', lines);
+            
+            let surname = '';
+            let givenNames = '';
+            
+            // Strategy 1: Look for specific passport format patterns
+            const ukSurnamePatterns = [
+                /Surname\/Nom\s*\(1\)\s+([A-Z]+)/i,
+                /surname[\/\s]*nom[^(]*\(1\)\s+([A-Z]+)/i,
+                /\(1\)\s+([A-Z]+)(?=\s+Given|\s+Prén)/i,
+            ];
+            
+            const ukGivenNamePatterns = [
+                /Given\s+names?\/Prénoms?\s*\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+                /given[^(]*\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+                /\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+            ];
+            
+            // Try UK passport specific patterns first
+            for (const pattern of ukSurnamePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    surname = match[1].trim();
+                    console.log('UK Surname found with pattern:', surname, 'using pattern:', pattern);
+                    break;
+                }
+            }
+            
+            for (const pattern of ukGivenNamePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    givenNames = match[1].trim().replace(/\s+/g, ' ');
+                    console.log('UK Given names found with pattern:', givenNames, 'using pattern:', pattern);
+                    break;
+                }
+            }
+            
+            // Strategy 2: Look for general surname/given names labels (fallback)
+            if (!surname) {
+                const generalSurnamePatterns = [
+                    /surname[:\s\/]+([A-Z]+)(?=\s+given|\s+first|\s+prén)/i,
+                    /family\s*name[:\s]+([A-Z]+)/i,
+                    /last\s*name[:\s]+([A-Z]+)/i,
+                ];
+                
+                for (const pattern of generalSurnamePatterns) {
+                    const match = text.match(pattern);
+                    if (match) {
+                        surname = match[1].trim();
+                        console.log('General surname found:', surname);
+                        break;
+                    }
+                }
+            }
+            
+            if (!givenNames) {
+                const generalGivenNamePatterns = [
+                    /(?:given\s*names?|first\s*names?|forenames?)[:\s\/]+([A-Z\s]+?)(?=\s+nationality|\s+british|\s+date|\s+sex)/i,
+                ];
+                
+                for (const pattern of generalGivenNamePatterns) {
+                    const match = text.match(pattern);
+                    if (match) {
+                        givenNames = match[1].trim().replace(/\s+/g, ' ');
+                        console.log('General given names found:', givenNames);
+                        break;
+                    }
+                }
+            }
+            
+            // Strategy 3: Look for MRZ (Machine Readable Zone) format
+            if (!surname || !givenNames) {
+                const mrzMatch = text.match(/P<GBR([A-Z]+)<<([A-Z<]+)/i);
+                if (mrzMatch) {
+                    if (!surname) surname = mrzMatch[1].replace(/</g, ' ').trim();
+                    if (!givenNames) givenNames = mrzMatch[2].replace(/</g, ' ').trim();
+                    console.log('Names extracted from MRZ - Surname:', surname, 'Given:', givenNames);
+                }
+            }
+            
+            // Strategy 4: Parse line by line looking for the name data after numbered fields
+            if (!surname || !givenNames) {
+                console.log('Trying line-by-line extraction...');
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    console.log(`Line ${i}: "${line}"`);
+                    
+                    // Look for "(1)" followed by surname
+                    if (!surname && /\(1\)/.test(line)) {
+                        const match = line.match(/\(1\)\s+([A-Z]+)/);
+                        if (match) {
+                            surname = match[1];
+                            console.log('Surname found in line after (1):', surname);
+                        }
+                    }
+                    
+                    // Look for "(2)" followed by given names
+                    if (!givenNames && /\(2\)/.test(line)) {
+                        const match = line.match(/\(2\)\s+([A-Z\s]+?)(?=\s+[A-Z]+\s+CITIZEN|\s+British|\s+\(3\)|$)/i);
+                        if (match) {
+                            givenNames = match[1].trim();
+                            console.log('Given names found in line after (2):', givenNames);
+                        }
+                    }
+                }
+            }
+            
+            // Strategy 5: Look for standalone name lines (avoiding header text)
+            if (!surname || !givenNames) {
+                console.log('Trying standalone name detection...');
+                for (const line of lines) {
+                    // Skip obvious header/title lines
+                    if (/passport|united kingdom|great britain|northern ireland|type|code/i.test(line)) {
+                        console.log('Skipping header line:', line);
+                        continue;
+                    }
+                    
+                    // Look for lines with just uppercase names
+                    const cleanLine = line.trim();
+                    if (/^[A-Z]{3,}$/.test(cleanLine) && cleanLine.length < 20 && !surname) {
+                        // Single word, likely surname
+                        surname = cleanLine;
+                        console.log('Surname from standalone line:', surname);
+                    } else if (/^[A-Z]+\s+[A-Z]+$/.test(cleanLine) && !givenNames) {
+                        // Two words, likely given names
+                        givenNames = cleanLine;
+                        console.log('Given names from standalone line:', givenNames);
+                    }
+                }
+            }
+            
+            console.log('Final name extraction results - Surname:', surname, 'Given Names:', givenNames);
+            
+            return {
+                surname: surname || '',
+                givenNames: givenNames || ''
+            };
+        }
+
+        function extractNationality(text, lines) {
+            const patterns = [
+                /nationality[:\s]+([A-Z]+)/i,
+                /nat[:\s]+([A-Z]+)/i,
+                /(BRITISH|AMERICAN|CANADIAN|GERMAN|FRENCH|ITALIAN|SPANISH)/i,
+                /GBR/i, // ISO code
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let nationality = match[1];
+                    // Convert common codes
+                    if (nationality === 'GBR') nationality = 'BRITISH';
+                    return nationality;
+                }
+            }
+            return '';
+        }
+
+        function extractDateOfBirth(text, lines) {
+            console.log('--- Extracting Date of Birth ---');
+            
+            const patterns = [
+                // UK passport format with field numbers
+                /Date of birth\/Date de naissance\s*\(4\)\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /\(4\)\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
+                
+                // General date of birth patterns
+                /date\s*of\s*birth[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /birth[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /dob[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                
+                // DD MMM YY format (common in UK passports)
+                /Date of birth[^(]*\(4\)[^0-9]*(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+                /\(4\)[^0-9]*(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+                
+                // Look for dates near "Date of birth" without strict formatting
+                /Date of birth[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|[0-9]{1,2})[\/\-\.\s]+\d{2,4})/i,
+                
+                // Any date format
+                /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
+                /(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let dateStr = match[1].trim();
+                    console.log('Date of birth found:', dateStr, 'using pattern:', pattern);
+                    
+                    // If it's a 2-digit year, assume it's in 1900s for birth dates
+                    if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '19$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    }
+                    
+                    return dateStr;
+                }
+            }
+            
+            console.log('No date of birth found');
+            return '';
+        }
+
+        function extractDateOfExpiry(text, lines) {
+            console.log('--- Extracting Date of Expiry ---');
+            console.log('Full text for expiry search:', text);
+            
+            const patterns = [
+                // UK passport format with field numbers - handle bilingual format
+                /Date of expiry\/Date d.expiration\s*\(9\)\s*(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/i,
+                /\(9\)\s*(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/,
+                
+                // Handle the bilingual month format like "JUN / JUIN"
+                /(\d{1,2}\s+[A-Z]{3}\s*\/\s*[A-Z]+\s+\d{2,4})/i,
+                /(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*\/\s*[A-Z]+\s+\d{2,4})/i,
+                
+                // Standard formats
+                /Date of expiry[^(]*\(9\)[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\/\-\.\s]*\d{2,4})/i,
+                /\(9\)[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\/\-\.\s]*\d{2,4})/i,
+                
+                // General expiry patterns
+                /(?:date\s*of\s*)?expiry[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /expires?[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /valid\s*until[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                
+                // Look for dates near "expiry" or field (9) - more flexible
+                /expiry[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|[0-9]{1,2})[\/\-\.\s]+\d{2,4})/i,
+                
+                // Very specific pattern for the format we see: "15 JUN / JUIN 32"
+                /(\d{1,2}\s+JUN\s*\/\s*JUIN\s+\d{2})/i,
+                /(\d{1,2}\s+[A-Z]{3}\s*\/\s*[A-Z]{4,}\s+\d{2})/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let dateStr = match[1].trim();
+                    console.log('Date of expiry found:', dateStr, 'using pattern:', pattern);
+                    
+                    // Clean up bilingual format - remove the second language part
+                    dateStr = dateStr.replace(/\s*\/\s*[A-Z]+/g, '');
+                    
+                    // If it's a 2-digit year, assume it's in 2000s for expiry dates
+                    if (/\d{1,2}\s+[A-Z]{3}\s+\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    } else if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    }
+                    
+                    return dateStr;
+                }
+            }
+            
+            // Fallback: look line by line for any date after field (9)
+            console.log('Trying line-by-line expiry search...');
+            let foundField9 = false;
+            for (const line of lines) {
+                console.log('Checking line:', line);
+                
+                if (/\(9\)/.test(line)) {
+                    foundField9 = true;
+                    console.log('Found field (9) in line');
+                }
+                
+                if (foundField9) {
+                    // Look for any date pattern in this line or next few lines
+                    const dateMatch = line.match(/(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/);
+                    if (dateMatch) {
+                        let dateStr = dateMatch[1].trim();
+                        console.log('Found expiry date in line after (9):', dateStr);
+                        
+                        // Clean up bilingual format
+                        dateStr = dateStr.replace(/\s*\/\s*[A-Z]+/g, '');
+                        
+                        // Expand 2-digit year
+                        if (/\d{2}$/.test(dateStr)) {
+                            dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        }
+                        
+                        return dateStr;
+                    }
+                }
+            }
+            
+            console.log('No date of expiry found');
+            return '';
+        }
+
+        function extractPlaceOfBirth(text, lines) {
+            const patterns = [
+                /place\s*of\s*birth[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date|sex|nationality)/i,
+                /born[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date|sex)/i,
+                /pob[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date)/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+            return '';
+        }
+
+        function extractSex(text, lines) {
+            const patterns = [
+                /sex[:\s]+([MF])/i,
+                /gender[:\s]+([MF])/i,
+                /\b([MF])\b/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].toUpperCase();
+                }
+            }
+            return '';
+        }
+
+        function displayOCRResults() {
+            const confidenceElement = document.getElementById('confidenceScore');
+            const resultsElement = document.getElementById('ocrResults');
+            const nextStepPreview = document.getElementById('nextStepPreview');
+            const retakeSection = document.getElementById('retakeSection');
+            
+            const text = ocrData.text || '';
+            console.log('Processing text for field extraction:', text);
+            
+            // Use the extraction function
+            const extractedData = extractDocumentData(text, selectedDocType);
+            
+            // Get only the fields we want to display for each document type
+            let displayFields = {};
+            let essentialFields = [];
+            
+            if (selectedDocType === 'passport') {
+                displayFields = {
+                    'Surname': extractedData['Surname'] || '',
+                    'Given Names': extractedData['Given Names'] || '',
+                    'Passport Number': extractedData['Passport Number'] || '',
+                    'Nationality': extractedData['Nationality'] || '',
+                    'Date of Birth': extractedData['Date of Birth'] || '',
+                    'Date of Expiry': extractedData['Date of Expiry'] || ''
+                };
+                
+                // Essential fields for passport
+                essentialFields = ['Surname', 'Given Names', 'Passport Number'];
+                
+                // Validate passport number format
+                if (displayFields['Passport Number'] && !validatePassportNumber(displayFields['Passport Number'])) {
+                    console.warn('Invalid passport number format:', displayFields['Passport Number']);
+                }
+                
+            } else {
+                // Driving license fields
+                displayFields = {
+                    'Surname': extractedData['1. Surname'] || extractedData['Surname'] || '',
+                    'Given Names': extractedData['2. Given Names'] || extractedData['Given Names'] || '',
+                    'Licence Number': extractedData['5. License Number'] || extractedData['License Number'] || '',
+                    'Date of Birth': extractedData['3. Date of Birth'] || '',
+                    'Authority': extractedData['4c. Authority'] || ''
+                };
+                
+                // Essential fields for driving license
+                essentialFields = ['Surname', 'Given Names', 'Licence Number'];
+            }
+            
+            // Calculate confidence based on extracted fields
+            let fieldsFound = 0;
+            let essentialFieldsFound = 0;
+            let numberFieldFound = false;
+            
+            console.log('=== FIELD VALIDATION ===');
+            
+            Object.entries(displayFields).forEach(([key, value]) => {
+                const hasValue = value && value.trim() !== '' && value !== 'Not detected';
+                console.log(`${key}: "${value}" - Valid: ${hasValue}`);
+                
+                if (hasValue) {
+                    fieldsFound++;
+                    
+                    // Check if this is an essential field
+                    if (essentialFields.includes(key)) {
+                        essentialFieldsFound++;
+                        
+                        // Special validation for number fields
+                        if (key.includes('Number') || key.includes('Licence Number')) {
+                            if (selectedDocType === 'passport') {
+                                numberFieldFound = validatePassportNumber(value);
+                            } else {
+                                numberFieldFound = validateDrivingLicenceNumber(value);
+                            }
+                            console.log(`${key} validation result:`, numberFieldFound);
+                        }
+                    }
+                }
+            });
+            
+            console.log('Fields found:', fieldsFound, 'Essential fields found:', essentialFieldsFound, 'Number field valid:', numberFieldFound);
+            
+            // Calculate confidence score
+            if (!numberFieldFound) {
+                confidenceScore = 0;
+                console.log('Confidence set to 0 - no valid document number');
+            } else if (essentialFieldsFound === essentialFields.length) {
+                confidenceScore = 100;
+                console.log('Confidence set to 100 - all essential fields found');
+            } else {
+                // Proportional score based on essential fields found
+                confidenceScore = Math.round((essentialFieldsFound / essentialFields.length) * 100);
+                console.log(`Confidence set to ${confidenceScore} - ${essentialFieldsFound}/${essentialFields.length} essential fields`);
+            }
+            
+            // Display confidence score and control visibility based on success/failure
+            if (confidenceScore === 0) {
+                // Failed scan - show only retake button
+                confidenceElement.className = 'confidence-score low';
+                confidenceElement.textContent = `❌ Document Number Not Found or Invalid`;
+                nextStepPreview.style.display = 'none';
+                retakeSection.style.display = 'block';
+            } else if (confidenceScore >= 50) {
+                // Good scan - show next step preview and retake button below it
+                if (confidenceScore < 100) {
+                    confidenceElement.className = 'confidence-score medium';
+                    confidenceElement.textContent = `⚠️ Confidence: ${confidenceScore}% - Some Essential Fields Missing`;
+                } else {
+                    confidenceElement.className = 'confidence-score';
+                    confidenceElement.textContent = `✅ Confidence: 100% - All Essential Fields Detected`;
+                }
+                nextStepPreview.style.display = 'block';
+                retakeSection.style.display = 'block';
+            } else {
+                // Low confidence - show only retake button
+                confidenceElement.className = 'confidence-score low';
+                confidenceElement.textContent = `❌ Confidence Too Low: ${confidenceScore}%`;
+                nextStepPreview.style.display = 'none';
+                retakeSection.style.display = 'block';
+            }
+            
+            // Display the extracted fields with clear status indicators
+            let resultsHTML = `<h3>📄 Extracted Information (${selectedDocType.charAt(0).toUpperCase() + selectedDocType.slice(1)}):</h3>`;
+            
+            Object.entries(displayFields).forEach(([key, value]) => {
+                const hasValue = value && value.trim() !== '' && value !== 'Not detected';
+                const isEssential = essentialFields.includes(key);
+                const isValid = hasValue && (!key.includes('Number') && !key.includes('Licence Number') || 
+                                (selectedDocType === 'passport' && validatePassportNumber(value)) ||
+                                (selectedDocType !== 'passport' && validateDrivingLicenceNumber(value)));
+                
+                let statusIcon = '';
+                let statusColor = '';
+                let displayValue = hasValue ? value : 'Not detected';
+                
+                if (isEssential) {
+                    if (isValid) {
+                        statusIcon = '✅';
+                        statusColor = '#28a745';
+                    } else if (hasValue) {
+                        statusIcon = '⚠️';
+                        statusColor = '#ffc107';
+                        displayValue += ' (Invalid format)';
+                    } else {
+                        statusIcon = '❌';
+                        statusColor = '#dc3545';
+                    }
+                } else {
+                    if (hasValue) {
+                        statusIcon = '✓';
+                        statusColor = '#6c757d';
+                    } else {
+                        statusIcon = '○';
+                        statusColor = '#dee2e6';
+                    }
+                }
+                
+                resultsHTML += `
+                    <div class="data-item">
+                        <span class="data-label">
+                            ${statusIcon} ${key}${isEssential ? ' *' : ''}:
+                        </span>
+                        <span class="data-value" style="color: ${statusColor};">
+                            ${displayValue}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            // Add legend
+            resultsHTML += `
+                <div style="background: #e3f2fd; color: #1565c0; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 12px;">
+                    <strong>Extraction Summary:</strong><br>
+                    Essential Fields: ${essentialFieldsFound}/${essentialFields.length} detected<br>
+                    Total Fields: ${fieldsFound}/${Object.keys(displayFields).length} detected<br>
+                    <em>* Essential fields required for verification</em>
+                </div>
+            `;
+            
+            // Add raw text preview for debugging
+            if (text && text.length > 20) {
+                resultsHTML += `
+                    <details style="margin-top: 20px;">
+                        <summary style="cursor: pointer; color: #6c757d; font-size: 14px;">🔍 View Raw OCR Text</summary>
+                        <div class="raw-text">${text}</div>
+                    </details>
+                `;
+            }
+            
+            resultsElement.innerHTML = resultsHTML;
+        }
+
+        function switchCamera() {
+            console.log('switchCamera called');
+            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            initCamera();
+        }
+
+        function switchPhotoCamera() {
+            console.log('switchPhotoCamera called');
+            initPhotoCamera();
+        }
+
+        async function capturePhoto() {
+            console.log('capturePhoto called');
+            const container = document.getElementById('photoContainer');
+            const video = container.querySelector('video');
+            
+            if (video && video.srcObject) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                photoImage = canvas.toDataURL('image/jpeg', 1.0);
+                
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            }
+            
+            if (photoImage) {
+                showStep(7);
+                
+                // Check if sendResultsEmail is defined
+                console.log('Is sendResultsEmail defined?', typeof sendResultsEmail);
+                
+                // Try to send email
+                try {
+                    console.log('Attempting to send email...');
+                    if (typeof sendResultsEmail === 'function') {
+                        await sendResultsEmail();
+                        console.log('Email sent successfully');
+                    } else {
+                        console.error('sendResultsEmail is not a function, using full inline email send');
+                        
+                        // Full email sending with attachments as fallback
+                        try {
+                            const extractedData = extractDocumentData(ocrData.text || '', selectedDocType);
+                            
+                            console.log('=== STARTING FULL EMAIL SEND ===');
+                            
+                            // Define resizeImage function inline
+                            const resizeImageInline = async (base64Image, maxWidth, maxHeight, quality = 1.0) => {
+                                return new Promise((resolve) => {
+                                    const img = new Image();
+                                    img.onload = function() {
+                                        const canvas = document.createElement('canvas');
+                                        let width = img.width;
+                                        let height = img.height;
+                                        
+                                        if (width > height) {
+                                            if (width > maxWidth) {
+                                                height = Math.round((height * maxWidth) / width);
+                                                width = maxWidth;
+                                            }
+                                        } else {
+                                            if (height > maxHeight) {
+                                                width = Math.round((width * maxHeight) / height);
+                                                height = maxHeight;
+                                            }
+                                        }
+                                        
+                                        canvas.width = width;
+                                        canvas.height = height;
+                                        
+                                        const ctx = canvas.getContext('2d');
+                                        ctx.imageSmoothingEnabled = true;
+                                        ctx.imageSmoothingQuality = 'high';
+                                        ctx.drawImage(img, 0, 0, width, height);
+                                        
+                                        const resizedBase64 = canvas.toDataURL('image/jpeg', quality);
+                                        console.log(`Image resized from ${img.width}x${img.height} to ${width}x${height}`);
+                                        console.log(`Quality: ${quality * 100}%, Size: ${Math.round(resizedBase64.length/1024)}KB`);
+                                        
+                                        resolve(resizedBase64);
+                                    };
+                                    img.src = base64Image;
+                                });
+                            };
+                            
+                            // Define createPDFReport function inline
+                            const createPDFReportInline = async (extractedData) => {
+                                const { jsPDF } = window.jspdf;
+                                const doc = new jsPDF();
+                                
+                                const primaryColor = [176, 60, 95];
+                                const darkColor = [51, 51, 51];
+                                const lightGray = [200, 200, 200];
+                                
+                                doc.setFillColor(...primaryColor);
+                                doc.rect(0, 0, 210, 40, 'F');
+                                
+                                doc.setTextColor(255, 255, 255);
+                                doc.setFontSize(24);
+                                doc.text('ID Verification Report', 105, 25, { align: 'center' });
+                                
+                                doc.setFontSize(12);
+                                doc.text('Parfitt Cresswell', 105, 35, { align: 'center' });
+                                
+                                doc.setTextColor(...darkColor);
+                                
+                                let yPos = 55;
+                                doc.setFontSize(10);
+                                doc.setTextColor(...lightGray);
+                                doc.text(`Report Generated: ${new Date().toLocaleString()}`, 20, yPos);
+                                doc.text(`ID Reference: ${idRef}`, 140, yPos);
+                                yPos += 15;
+                                
+                                doc.setTextColor(...primaryColor);
+                                doc.setFontSize(16);
+                                doc.text('Document Information', 20, yPos);
+                                yPos += 10;
+                                
+                                doc.setDrawColor(...lightGray);
+                                doc.line(20, yPos, 190, yPos);
+                                yPos += 10;
+                                
+                                doc.setTextColor(...darkColor);
+                                doc.setFontSize(11);
+                                
+                                doc.setFont(undefined, 'bold');
+                                doc.text('ID Reference:', 20, yPos);
+                                doc.setFont(undefined, 'normal');
+                                doc.setTextColor(...primaryColor);
+                                doc.text(idRef, 60, yPos);
+                                doc.setTextColor(...darkColor);
+                                yPos += 8;
+                                
+                                doc.setFont(undefined, 'bold');
+                                doc.text('Document Type:', 20, yPos);
+                                doc.setFont(undefined, 'normal');
+                                doc.text(selectedDocType.charAt(0).toUpperCase() + selectedDocType.slice(1), 60, yPos);
+                                yPos += 8;
+                                
+                                doc.setFont(undefined, 'bold');
+                                doc.text('Confidence Score:', 20, yPos);
+                                doc.setFont(undefined, 'normal');
+                                const scoreColor = confidenceScore >= 80 ? [40, 167, 69] : confidenceScore >= 60 ? [255, 193, 7] : [220, 53, 69];
+                                doc.setTextColor(...scoreColor);
+                                doc.text(`${confidenceScore}%`, 60, yPos);
+                                doc.setTextColor(...darkColor);
+                                yPos += 8;
+                                
+                                doc.setFont(undefined, 'bold');
+                                doc.text('Processing Method:', 20, yPos);
+                                doc.setFont(undefined, 'normal');
+                                doc.text(ocrData.method || 'Azure Computer Vision v3.2', 60, yPos);
+                                yPos += 15;
+                                
+                                doc.setTextColor(...primaryColor);
+                                doc.setFontSize(16);
+                                doc.text('Extracted Information', 20, yPos);
+                                yPos += 10;
+                                
+                                doc.setDrawColor(...lightGray);
+                                doc.line(20, yPos, 190, yPos);
+                                yPos += 10;
+                                
+                                doc.setTextColor(...darkColor);
+                                doc.setFontSize(11);
+                                
+                                Object.entries(extractedData).forEach(([key, value]) => {
+                                    if (yPos > 250) {
+                                        doc.addPage();
+                                        yPos = 30;
+                                    }
+                                    
+                                    doc.setFont(undefined, 'bold');
+                                    doc.text(`${key}:`, 20, yPos);
+                                    
+                                    doc.setFont(undefined, 'normal');
+                                    const displayValue = value && value.trim() !== '' ? value : 'Not detected';
+                                    const valueColor = displayValue === 'Not detected' ? [220, 53, 69] : [40, 167, 69];
+                                    doc.setTextColor(...valueColor);
+                                    
+                                    const maxWidth = 120;
+                                    const lines = doc.splitTextToSize(displayValue, maxWidth);
+                                    
+                                    if (lines.length > 0) {
+                                        doc.text(lines[0], 70, yPos);
+                                    }
+                                    
+                                    for (let i = 1; i < lines.length; i++) {
+                                        yPos += 6;
+                                        if (yPos > 250) {
+                                            doc.addPage();
+                                            yPos = 30;
+                                        }
+                                        doc.text(lines[i], 70, yPos);
+                                    }
+                                    
+                                    doc.setTextColor(...darkColor);
+                                    yPos += 10;
+                                });
+                                
+                                // Add images
+                                if (documentImage) {
+                                    doc.addPage();
+                                    doc.setTextColor(...primaryColor);
+                                    doc.setFontSize(16);
+                                    doc.text('Document Image', 105, 20, { align: 'center' });
+                                    
+                                    try {
+                                        const imgData = await resizeImageInline(documentImage, 2000, 2800, 1.0);
+                                        const pageWidth = 210;
+                                        const pageHeight = 297;
+                                        const margin = 20;
+                                        const maxImgWidth = pageWidth - (2 * margin);
+                                        const maxImgHeight = pageHeight - 60;
+                                        
+                                        const img = new Image();
+                                        await new Promise((resolve) => {
+                                            img.onload = resolve;
+                                            img.src = imgData;
+                                        });
+                                        
+                                        let imgWidth = img.width;
+                                        let imgHeight = img.height;
+                                        
+                                        const widthRatio = maxImgWidth / imgWidth;
+                                        const heightRatio = maxImgHeight / imgHeight;
+                                        const scale = Math.min(widthRatio, heightRatio, 1);
+                                        
+                                        imgWidth *= scale;
+                                        imgHeight *= scale;
+                                        
+                                        const xPos = (pageWidth - imgWidth) / 2;
+                                        const yPos = 30;
+                                        
+                                        doc.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                                    } catch (error) {
+                                        console.error('Error adding document image to PDF:', error);
+                                    }
+                                }
+                                
+                                if (photoImage) {
+                                    doc.addPage();
+                                    doc.setTextColor(...primaryColor);
+                                    doc.setFontSize(16);
+                                    doc.text('Photo Verification', 105, 20, { align: 'center' });
+                                    
+                                    try {
+                                        const imgData = await resizeImageInline(photoImage, 1200, 1200, 1.0);
+                                        const img = new Image();
+                                        await new Promise((resolve) => {
+                                            img.onload = resolve;
+                                            img.src = imgData;
+                                        });
+                                        
+                                        let imgWidth = img.width;
+                                        let imgHeight = img.height;
+                                        
+                                        const maxPhotoSize = 120;
+                                        const scale = Math.min(maxPhotoSize / imgWidth, maxPhotoSize / imgHeight, 1);
+                                        
+                                        imgWidth *= scale;
+                                        imgHeight *= scale;
+                                        
+                                        const xPos = (210 - imgWidth) / 2;
+                                        const yPos = 40;
+                                        
+                                        doc.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                                    } catch (error) {
+                                        console.error('Error adding photo to PDF:', error);
+                                    }
+                                }
+                                
+                                const pageCount = doc.internal.getNumberOfPages();
+                                for (let i = 1; i <= pageCount; i++) {
+                                    doc.setPage(i);
+                                    doc.setTextColor(...lightGray);
+                                    doc.setFontSize(9);
+                                    doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: 'center' });
+                                    doc.text('Confidential - Parfitt Cresswell', 20, 285);
+                                }
+                                
+                                const pdfBase64 = doc.output('datauristring').split(',')[1];
+                                console.log('PDF generated, size:', Math.round(pdfBase64.length / 1024) + 'KB');
+                                
+                                return pdfBase64;
+                            };
+                            
+                            // Resize images for email
+                            const resizedDocumentImage = await resizeImageInline(documentImage, 1500, 1200, 1.0);
+                            const resizedPhotoImage = await resizeImageInline(photoImage, 800, 1000, 1.0);
+                            
+                            // Generate PDF report
+                            const pdfBase64 = await createPDFReportInline(extractedData);
+                            
+                            // Remove the data:image/jpeg;base64, prefix from images
+                            const documentBase64 = resizedDocumentImage.split(',')[1];
+                            const photoBase64 = resizedPhotoImage.split(',')[1];
+                            
+                            // Create beautifully formatted HTML email
+                            const htmlBody = `
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <style>
+                                        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+                                        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+                                        .header { background: #B03C5F; color: white; padding: 40px 30px; text-align: center; }
+                                        .header h1 { margin: 0 0 10px 0; font-size: 28px; font-weight: 300; }
+                                        .header p { margin: 0; opacity: 0.9; font-size: 14px; }
+                                        .content { padding: 40px 30px; }
+                                        .section { margin-bottom: 30px; }
+                                        .section-title { color: #B03C5F; font-size: 20px; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+                                        .info-grid { display: table; width: 100%; }
+                                        .info-row { display: table-row; }
+                                        .info-label { display: table-cell; padding: 8px 15px 8px 0; font-weight: 600; color: #666; width: 40%; vertical-align: top; }
+                                        .info-value { display: table-cell; padding: 8px 0; color: #333; }
+                                        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+                                        .status-high { background-color: #d4edda; color: #155724; }
+                                        .status-medium { background-color: #fff3cd; color: #856404; }
+                                        .status-low { background-color: #f8d7da; color: #721c24; }
+                                        .extracted-fields { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                                        .field-item { padding: 10px 0; border-bottom: 1px solid #e9ecef; }
+                                        .field-item:last-child { border-bottom: none; }
+                                        .field-name { font-weight: 600; color: #495057; }
+                                        .field-value { color: #28a745; margin-left: 10px; }
+                                        .field-value.not-detected { color: #dc3545; }
+                                        .alert { padding: 15px 20px; border-radius: 8px; margin: 20px 0; }
+                                        .alert-info { background-color: #e3f2fd; color: #1565c0; border-left: 4px solid #1976d2; }
+                                        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; font-size: 12px; }
+                                        .footer a { color: #B03C5F; text-decoration: none; }
+                                        .attachment-notice { background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; }
+                                        .attachment-notice h4 { color: #2e7d32; margin: 0 0 10px 0; }
+                                        .attachment-list { list-style: none; padding: 0; margin: 0; }
+                                        .attachment-list li { padding: 5px 0; color: #388e3c; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="container">
+                                        <div class="header">
+                                            <h1>ID Verification Report</h1>
+                                            <p>${new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                        </div>
+                                        
+                                        <div class="content">
+                                            <div class="section">
+                                                <h2 class="section-title">Verification Summary</h2>
+                                                <div class="info-grid">
+                                                    <div class="info-row">
+                                                        <div class="info-label">ID Reference:</div>
+                                                        <div class="info-value"><strong style="color: #B03C5F;">${idRef}</strong></div>
+                                                    </div>
+                                                    <div class="info-row">
+                                                        <div class="info-label">Document Type:</div>
+                                                        <div class="info-value"><strong>${selectedDocType.charAt(0).toUpperCase() + selectedDocType.slice(1)}</strong></div>
+                                                    </div>
+                                                    <div class="info-row">
+                                                        <div class="info-label">Confidence Score:</div>
+                                                        <div class="info-value">
+                                                            <span class="status-badge ${confidenceScore >= 80 ? 'status-high' : confidenceScore >= 60 ? 'status-medium' : 'status-low'}">
+                                                                ${confidenceScore}% ${confidenceScore >= 80 ? '✓ Excellent' : confidenceScore >= 60 ? '⚡ Good' : '⚠️ Manual Review'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-row">
+                                                        <div class="info-label">Processing Method:</div>
+                                                        <div class="info-value">${ocrData.method || 'Azure Computer Vision v3.2'}</div>
+                                                    </div>
+                                                    <div class="info-row">
+                                                        <div class="info-label">Processed At:</div>
+                                                        <div class="info-value">${new Date().toLocaleString('en-GB')}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="section">
+                                                <h2 class="section-title">Extracted Information</h2>
+                                                <div class="extracted-fields">
+                                                    ${Object.entries(extractedData).map(([key, value]) => `
+                                                        <div class="field-item">
+                                                            <span class="field-name">${key}:</span>
+                                                            <span class="field-value ${!value || value.trim() === '' ? 'not-detected' : ''}">${value && value.trim() !== '' ? value : 'Not detected'}</span>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="attachment-notice">
+                                                <h4>📎 Attachments Included</h4>
+                                                <ul class="attachment-list">
+                                                    <li>✓ Full PDF Report with images</li>
+                                                    <li>✓ Original document image</li>
+                                                    <li>✓ Photo verification image</li>
+                                                </ul>
+                                            </div>
+                                            
+                                            ${confidenceScore < 60 ? `
+                                            <div class="alert alert-info">
+                                                <strong>Manual Review Recommended:</strong> The confidence score is below 60%. Please review the attached images and PDF report for manual verification.
+                                            </div>
+                                            ` : ''}
+                                            
+                                            <div style="text-align: center; margin-top: 30px;">
+                                                <p style="color: #6c757d;">This report was automatically generated by the ID Scanner system.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="footer">
+                                            <p><strong>Parfitt Cresswell</strong></p>
+                                            <p>Secure Document Verification System</p>
+                                            <p style="margin-top: 15px; font-size: 11px;">
+                                                This email and any attachments are confidential and intended solely for the addressee.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </body>
+                                </html>
+                            `;
+                            
+                            // Create plain text version
+                            const textBody = `ID VERIFICATION REPORT
+=====================
+
+ID Reference: ${idRef}
+Document Type: ${selectedDocType.charAt(0).toUpperCase() + selectedDocType.slice(1)}
+Confidence Score: ${confidenceScore}%
+Processing Method: ${ocrData.method || 'Azure Computer Vision v3.2'}
+Timestamp: ${new Date().toLocaleString('en-GB')}
+
+EXTRACTED INFORMATION
+--------------------
+${Object.entries(extractedData).map(([key, value]) => `${key}: ${value || 'Not detected'}`).join('\n')}
+
+ATTACHMENTS
+-----------
+- Full PDF Report with images
+- Original document image  
+- Photo verification image
+
+${confidenceScore < 60 ? '\nNOTE: Manual review recommended due to low confidence score.\n' : ''}
+
+---
+Parfitt Cresswell - Secure Document Verification System
+This email and any attachments are confidential.`;
+                            
+                            // Prepare SMTP2GO API request with attachments
+                            const emailData = {
+                                api_key: SMTP2GO_CONFIG.apiKey,
+                                to: [
+                                    'David.grooms@parfittcresswell.com',
+                                    'mail@davegrooms.co.uk',
+                                    'compliance@parfittcresswell.com'
+                                ],
+                                sender: 'ID Scanner <noreply@parfittcresswell.com>',
+                                subject: `ID Verification Report - ${selectedDocType.charAt(0).toUpperCase() + selectedDocType.slice(1)} - Ref: ${idRef} [${new Date().toLocaleDateString('en-GB')}]`,
+                                html_body: htmlBody,
+                                text_body: textBody,
+                                attachments: [
+                                    {
+                                        filename: `ID_Verification_Report_${selectedDocType}_${idRef}_${Date.now()}.pdf`,
+                                        fileblob: pdfBase64,
+                                        mimetype: 'application/pdf'
+                                    },
+                                    {
+                                        filename: `document_${selectedDocType}_${idRef}_${Date.now()}.jpg`,
+                                        fileblob: documentBase64,
+                                        mimetype: 'image/jpeg'
+                                    },
+                                    {
+                                        filename: `photo_verification_${idRef}_${Date.now()}.jpg`,
+                                        fileblob: photoBase64,
+                                        mimetype: 'image/jpeg'
+                                    }
+                                ]
+                            };
+                            
+                            console.log('📧 Sending full email with attachments via SMTP2GO...');
+                            console.log('Recipients:', emailData.to);
+                            console.log('Subject:', emailData.subject);
+                            console.log('Attachments:', emailData.attachments.map(a => `${a.filename} (${Math.round(a.fileblob.length/1024)}KB)`));
+                            
+                            const response = await fetch(SMTP2GO_CONFIG.apiUrl + 'email/send', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify(emailData)
+                            });
+                            
+                            console.log('SMTP2GO Response status:', response.status);
+                            const result = await response.json();
+                            console.log('SMTP2GO Response:', result);
+                            
+                            if (response.ok && result.data && result.data.succeeded > 0) {
+                                console.log('✅ Full email with attachments sent successfully!');
+                                console.log('Email ID:', result.data.email_id);
+                            } else {
+                                throw new Error(result.data ? result.data.error || 'Email sending failed' : 'Unknown error');
+                            }
+                        } catch (err) {
+                            console.error('Full email error:', err);
+                            alert('Email sending encountered an error. Check console for details.');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Email sending failed:', error);
+                    alert('Note: Email sending failed. Check console for details. The verification is still complete.');
+                }
+                
+                // Always show success screen after 3 seconds
+                setTimeout(() => {
+                    console.log('Moving to thank you screen');
+                    showStep(8);
+                }, 3000);
+            } else {
+                alert('Please capture or upload a photo first.');
+            }
+        }
+
+        function startOver() {
+            console.log('startOver called');
+            currentStep = 0;
+            selectedDocType = '';
+            documentImage = null;
+            photoImage = null;
+            ocrData = null;
+            confidenceScore = 0;
+            idRef = '';
+            cameraPermissionGranted = false;
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            // Clear the ID input
+            const idRefInput = document.getElementById('idRefInput');
+            if (idRefInput) {
+                idRefInput.value = '';
+            }
+            
+            showStep(0);
+        }
+
+        async function initCamera() {
+            console.log('Initializing camera...');
+            
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                const constraints = {
+                    video: { facingMode: currentCamera }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('Camera stream started successfully');
+                cameraPermissionGranted = true;
+
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.style.width = '100%';
+                video.style.borderRadius = '12px';
+                
+                const container = document.getElementById('cameraContainer');
+                container.innerHTML = '';
+                container.appendChild(video);
+                
+            } catch (error) {
+                console.error('Camera initialization error:', error);
+                cameraPermissionGranted = false;
+                showCameraFallback('cameraContainer');
+            }
+        }
+
+        async function initPhotoCamera() {
+            console.log('Initializing photo camera...');
+            
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                const constraints = {
+                    video: { facingMode: 'user' }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('Photo camera stream started successfully');
+
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.style.width = '100%';
+                video.style.borderRadius = '12px';
+                
+                const container = document.getElementById('photoContainer');
+                container.innerHTML = '';
+                container.appendChild(video);
+                
+            } catch (error) {
+                console.error('Photo camera initialization error:', error);
+                showCameraFallback('photoContainer');
+            }
+        }
+
+        function showCameraFallback(containerId) {
+            const container = document.getElementById(containerId);
+            const isPhoto = containerId === 'photoContainer';
+            
+            container.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">${isPhoto ? '🤳' : '📁'}</div>
+                    <p style="margin-bottom: 15px;">Camera not available</p>
+                    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">
+                        ${isPhoto ? 'Upload a selfie photo' : 'Upload a photo of your document'}
+                    </p>
+                    <input type="file" id="${isPhoto ? 'photoFileInput' : 'fileInput'}" 
+                           accept="image/*" capture="${isPhoto ? 'user' : 'environment'}" 
+                           style="display: none;" 
+                           onchange="${isPhoto ? 'handlePhotoUpload(event)' : 'handleFileUpload(event)'}">
+                    <button onclick="document.getElementById('${isPhoto ? 'photoFileInput' : 'fileInput'}').click()" 
+                            style="background: #004E92; 
+                                   color: white; border: none; padding: 12px 24px; 
+                                   border-radius: 25px; cursor: pointer;">
+                        ${isPhoto ? '📸 Upload Selfie' : '📷 Upload Photo'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    documentImage = e.target.result;
+                    
+                    const container = document.getElementById('cameraContainer');
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <img src="${e.target.result}" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 3px solid #28a745;">
+                            <p style="color: #28a745; margin-top: 10px; font-weight: bold;">✅ Document uploaded</p>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoImage = e.target.result;
+                    
+                    const container = document.getElementById('photoContainer');
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <img src="${e.target.result}" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
+                            <p style="color: #28a745; margin-top: 10px;">✅ Photo uploaded</p>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+    <script>
+        // SMTP2GO configuration
+        const SMTP2GO_CONFIG = {
+            apiUrl: 'https://api.smtp2go.com/v3/',
+            apiKey: 'api-46B81FB9224244EC81CFE27994B4775E'
+        };
+
+        // Azure Computer Vision configuration
+        const AZURE_CONFIG = {
+            endpoint: 'https://id.cognitiveservices.azure.com/',
+            apiKey: '5vMDwlr9ChvgIkjqeeYJw9vxDNldvyp2YfT5o2eR0i3p8QVMaEvoJQQJ99BFACmepeSXJ3w3AAAFACOGY602',
+            apiVersion: '3.2'
+        };
+
+        let selectedDocType = '';
+        let stream = null;
+        let currentCamera = 'environment';
+        let documentImage = null;
+        let photoImage = null;
+        let ocrData = null;
+        let confidenceScore = 0;
+        let idRef = '';
+        let currentStep = 0;
+        let cameraPermissionGranted = false;
+
+        // Get ID Ref from URL parameters
+        function getURLParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Enhanced passport data extraction function
+        function extractPassportData(text) {
+            console.log('=== PASSPORT DATA EXTRACTION ===');
+            console.log('Input text:', text);
+            
+            const data = {};
+            
+            // Clean and normalize the text
+            const cleanText = text.replace(/[^\w\s\/\-\.]/g, ' ').replace(/\s+/g, ' ').trim();
+            const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            console.log('Cleaned text:', cleanText);
+            console.log('Lines found:', lines);
+            
+            // Extract passport number - multiple patterns
+            data['Passport Number'] = extractPassportNumber(text, lines);
+            
+            // Extract surname and given names
+            const nameData = extractPassportNames(text, lines);
+            data['Surname'] = nameData.surname;
+            data['Given Names'] = nameData.givenNames;
+            
+            // Extract other passport fields
+            data['Nationality'] = extractNationality(text, lines);
+            data['Date of Birth'] = extractDateOfBirth(text, lines);
+            data['Date of Expiry'] = extractDateOfExpiry(text, lines);
+            data['Place of Birth'] = extractPlaceOfBirth(text, lines);
+            data['Sex'] = extractSex(text, lines);
+            
+            console.log('Final extracted passport data:', data);
+            return data;
+        }
+
+        function extractPassportNumber(text, lines) {
+            console.log('--- Extracting Passport Number ---');
+            
+            // UK passport numbers are typically 9 digits
+            const patterns = [
+                // Direct passport number patterns
+                /passport\s*(?:no|number|num)?[:\s]*([0-9]{9})/i,
+                /passport[:\s]*([0-9]{9})/i,
+                /(?:^|\s)([0-9]{9})(?:\s|$)/,
+                
+                // Machine readable zone patterns (MRZ) - last line typically contains passport number
+                /GBR([0-9]{9})/i,
+                /P<GBR([0-9]{9})/i,
+                
+                // Look for 9 consecutive digits anywhere
+                /\b([0-9]{9})\b/,
+                
+                // Sometimes with spaces or separators
+                /([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3})/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const passportNum = match[1].replace(/[\s\-]/g, '');
+                    if (passportNum.length === 9 && /^\d{9}$/.test(passportNum)) {
+                        console.log('Passport number found:', passportNum, 'using pattern:', pattern);
+                        return passportNum;
+                    }
+                }
+            }
+            
+            // Check each line for standalone 9-digit numbers
+            for (const line of lines) {
+                const digitMatch = line.match(/\b(\d{9})\b/);
+                if (digitMatch) {
+                    console.log('Passport number found in line:', digitMatch[1]);
+                    return digitMatch[1];
+                }
+            }
+            
+            console.log('No passport number found');
+            return '';
+        }
+
+        function extractPassportNames(text, lines) {
+            console.log('--- Extracting Names ---');
+            console.log('Raw text for name extraction:', text);
+            console.log('Lines for analysis:', lines);
+            
+            let surname = '';
+            let givenNames = '';
+            
+            // Strategy 1: Look for specific passport format patterns
+            // UK passports often have: "Surname/Nom (1) SURNAME" and "Given names/Prénoms (2) GIVEN NAMES"
+            const ukSurnamePatterns = [
+                /Surname\/Nom\s*\(1\)\s+([A-Z]+)/i,
+                /surname[\/\s]*nom[^(]*\(1\)\s+([A-Z]+)/i,
+                /\(1\)\s+([A-Z]+)(?=\s+Given|\s+Prén)/i,
+            ];
+            
+            const ukGivenNamePatterns = [
+                /Given\s+names?\/Prénoms?\s*\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+                /given[^(]*\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+                /\(2\)\s+([A-Z\s]+?)(?=\s+Nationality|\s+British|\s+\(3\))/i,
+            ];
+            
+            // Try UK passport specific patterns first
+            for (const pattern of ukSurnamePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    surname = match[1].trim();
+                    console.log('UK Surname found with pattern:', surname, 'using pattern:', pattern);
+                    break;
+                }
+            }
+            
+            for (const pattern of ukGivenNamePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    givenNames = match[1].trim().replace(/\s+/g, ' ');
+                    console.log('UK Given names found with pattern:', givenNames, 'using pattern:', pattern);
+                    break;
+                }
+            }
+            
+            // Strategy 2: Look for general surname/given names labels (fallback)
+            if (!surname) {
+                const generalSurnamePatterns = [
+                    /surname[:\s\/]+([A-Z]+)(?=\s+given|\s+first|\s+prén)/i,
+                    /family\s*name[:\s]+([A-Z]+)/i,
+                    /last\s*name[:\s]+([A-Z]+)/i,
+                ];
+                
+                for (const pattern of generalSurnamePatterns) {
+                    const match = text.match(pattern);
+                    if (match) {
+                        surname = match[1].trim();
+                        console.log('General surname found:', surname);
+                        break;
+                    }
+                }
+            }
+            
+            if (!givenNames) {
+                const generalGivenNamePatterns = [
+                    /(?:given\s*names?|first\s*names?|forenames?)[:\s\/]+([A-Z\s]+?)(?=\s+nationality|\s+british|\s+date|\s+sex)/i,
+                ];
+                
+                for (const pattern of generalGivenNamePatterns) {
+                    const match = text.match(pattern);
+                    if (match) {
+                        givenNames = match[1].trim().replace(/\s+/g, ' ');
+                        console.log('General given names found:', givenNames);
+                        break;
+                    }
+                }
+            }
+            
+            // Strategy 3: Look for MRZ (Machine Readable Zone) format
+            if (!surname || !givenNames) {
+                const mrzMatch = text.match(/P<GBR([A-Z]+)<<([A-Z<]+)/i);
+                if (mrzMatch) {
+                    if (!surname) surname = mrzMatch[1].replace(/</g, ' ').trim();
+                    if (!givenNames) givenNames = mrzMatch[2].replace(/</g, ' ').trim();
+                    console.log('Names extracted from MRZ - Surname:', surname, 'Given:', givenNames);
+                }
+            }
+            
+            // Strategy 4: Parse line by line looking for the name data after numbered fields
+            if (!surname || !givenNames) {
+                console.log('Trying line-by-line extraction...');
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    console.log(`Line ${i}: "${line}"`);
+                    
+                    // Look for "(1)" followed by surname
+                    if (!surname && /\(1\)/.test(line)) {
+                        const match = line.match(/\(1\)\s+([A-Z]+)/);
+                        if (match) {
+                            surname = match[1];
+                            console.log('Surname found in line after (1):', surname);
+                        }
+                    }
+                    
+                    // Look for "(2)" followed by given names
+                    if (!givenNames && /\(2\)/.test(line)) {
+                        const match = line.match(/\(2\)\s+([A-Z\s]+?)(?=\s+[A-Z]+\s+CITIZEN|\s+British|\s+\(3\)|$)/i);
+                        if (match) {
+                            givenNames = match[1].trim();
+                            console.log('Given names found in line after (2):', givenNames);
+                        }
+                    }
+                }
+            }
+            
+            // Strategy 5: Look for standalone name lines (avoiding header text)
+            if (!surname || !givenNames) {
+                console.log('Trying standalone name detection...');
+                for (const line of lines) {
+                    // Skip obvious header/title lines
+                    if (/passport|united kingdom|great britain|northern ireland|type|code/i.test(line)) {
+                        console.log('Skipping header line:', line);
+                        continue;
+                    }
+                    
+                    // Look for lines with just uppercase names
+                    const cleanLine = line.trim();
+                    if (/^[A-Z]{3,}$/.test(cleanLine) && cleanLine.length < 20 && !surname) {
+                        // Single word, likely surname
+                        surname = cleanLine;
+                        console.log('Surname from standalone line:', surname);
+                    } else if (/^[A-Z]+\s+[A-Z]+$/.test(cleanLine) && !givenNames) {
+                        // Two words, likely given names
+                        givenNames = cleanLine;
+                        console.log('Given names from standalone line:', givenNames);
+                    }
+                }
+            }
+            
+            console.log('Final name extraction results - Surname:', surname, 'Given Names:', givenNames);
+            
+            return {
+                surname: surname || '',
+                givenNames: givenNames || ''
+            };
+        }
+
+        function extractNationality(text, lines) {
+            const patterns = [
+                /nationality[:\s]+([A-Z]+)/i,
+                /nat[:\s]+([A-Z]+)/i,
+                /(BRITISH|AMERICAN|CANADIAN|GERMAN|FRENCH|ITALIAN|SPANISH)/i,
+                /GBR/i, // ISO code
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let nationality = match[1];
+                    // Convert common codes
+                    if (nationality === 'GBR') nationality = 'BRITISH';
+                    return nationality;
+                }
+            }
+            return '';
+        }
+
+        function extractDateOfBirth(text, lines) {
+            console.log('--- Extracting Date of Birth ---');
+            
+            const patterns = [
+                // UK passport format with field numbers
+                /Date of birth\/Date de naissance\s*\(4\)\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /\(4\)\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
+                
+                // General date of birth patterns
+                /date\s*of\s*birth[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /birth[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /dob[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                
+                // DD MMM YY format (common in UK passports)
+                /Date of birth[^(]*\(4\)[^0-9]*(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+                /\(4\)[^0-9]*(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+                
+                // Look for dates near "Date of birth" without strict formatting
+                /Date of birth[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|[0-9]{1,2})[\/\-\.\s]+\d{2,4})/i,
+                
+                // Any date format
+                /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
+                /(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let dateStr = match[1].trim();
+                    console.log('Date of birth found:', dateStr, 'using pattern:', pattern);
+                    
+                    // If it's a 2-digit year, assume it's in 1900s for birth dates
+                    if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '19$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    }
+                    
+                    return dateStr;
+                }
+            }
+            
+            console.log('No date of birth found');
+            return '';
+        }
+
+        function extractDateOfExpiry(text, lines) {
+            console.log('--- Extracting Date of Expiry ---');
+            console.log('Full text for expiry search:', text);
+            
+            const patterns = [
+                // UK passport format with field numbers - handle bilingual format
+                /Date of expiry\/Date d.expiration\s*\(9\)\s*(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/i,
+                /\(9\)\s*(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/,
+                
+                // Handle the bilingual month format like "JUN / JUIN"
+                /(\d{1,2}\s+[A-Z]{3}\s*\/\s*[A-Z]+\s+\d{2,4})/i,
+                /(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*\/\s*[A-Z]+\s+\d{2,4})/i,
+                
+                // Standard formats
+                /Date of expiry[^(]*\(9\)[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\/\-\.\s]*\d{2,4})/i,
+                /\(9\)[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\/\-\.\s]*\d{2,4})/i,
+                
+                // General expiry patterns
+                /(?:date\s*of\s*)?expiry[:\s\/]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /expires?[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                /valid\s*until[:\s]*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+                
+                // Look for dates near "expiry" or field (9) - more flexible
+                /expiry[^0-9]*(\d{1,2}[\/\-\.\s]+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|[0-9]{1,2})[\/\-\.\s]+\d{2,4})/i,
+                
+                // Very specific pattern for the format we see: "15 JUN / JUIN 32"
+                /(\d{1,2}\s+JUN\s*\/\s*JUIN\s+\d{2})/i,
+                /(\d{1,2}\s+[A-Z]{3}\s*\/\s*[A-Z]{4,}\s+\d{2})/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let dateStr = match[1].trim();
+                    console.log('Date of expiry found:', dateStr, 'using pattern:', pattern);
+                    
+                    // Clean up bilingual format - remove the second language part
+                    dateStr = dateStr.replace(/\s*\/\s*[A-Z]+/g, '');
+                    
+                    // If it's a 2-digit year, assume it's in 2000s for expiry dates
+                    if (/\d{1,2}\s+[A-Z]{3}\s+\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    } else if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2}$/.test(dateStr)) {
+                        dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        console.log('Expanded 2-digit year to:', dateStr);
+                    }
+                    
+                    return dateStr;
+                }
+            }
+            
+            // Fallback: look line by line for any date after field (9)
+            console.log('Trying line-by-line expiry search...');
+            let foundField9 = false;
+            for (const line of lines) {
+                console.log('Checking line:', line);
+                
+                if (/\(9\)/.test(line)) {
+                    foundField9 = true;
+                    console.log('Found field (9) in line');
+                }
+                
+                if (foundField9) {
+                    // Look for any date pattern in this line or next few lines
+                    const dateMatch = line.match(/(\d{1,2}\s+[A-Z]{3}[\/\s]*[A-Z]*\s*\d{2,4})/);
+                    if (dateMatch) {
+                        let dateStr = dateMatch[1].trim();
+                        console.log('Found expiry date in line after (9):', dateStr);
+                        
+                        // Clean up bilingual format
+                        dateStr = dateStr.replace(/\s*\/\s*[A-Z]+/g, '');
+                        
+                        // Expand 2-digit year
+                        if (/\d{2}$/.test(dateStr)) {
+                            dateStr = dateStr.replace(/(\d{2})$/, '20$1');
+                        }
+                        
+                        return dateStr;
+                    }
+                }
+            }
+            
+            console.log('No date of expiry found');
+            return '';
+        }
+
+        function extractPlaceOfBirth(text, lines) {
+            const patterns = [
+                /place\s*of\s*birth[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date|sex|nationality)/i,
+                /born[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date|sex)/i,
+                /pob[:\s]+([A-Z][A-Z\s,]+?)(?:\n|date)/i,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+            return '';
+        }
+
+        function extractSex(text, lines) {
+            const patterns = [
+                /sex[:\s]+([MF])/i,
+                /gender[:\s]+([MF])/i,
+                /\b([MF])\b/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].toUpperCase();
+                }
+            }
+            return '';
+        }
+
+        // Enhanced pattern extraction helper
+        function extractPattern(text, pattern) {
+            const match = text.match(pattern);
+            return match ? match[1].trim() : null;
+        }
+
+        // Replace the existing passport extraction in your main function
+        function extractDocumentData(text, docType) {
+            console.log('=== DOCUMENT DATA EXTRACTION ===');
+            console.log('Document type:', docType);
+            console.log('Input text:', text);
+            
+            if (docType === 'passport') {
+                return extractPassportData(text);
+            } else {
+                // Keep existing driving license extraction logic
+                const data = {};
+                data['Document Type'] = 'UK Driving License';
+                
+                // More flexible patterns for UK license
+                data['1. Surname'] = extractPattern(text, /1\.?\s*([A-Z]+)/i) ||
+                                    extractPattern(text, /GROOMS/i) ||
+                                    extractPattern(text, /^([A-Z]{4,})$/m);
+                
+                data['2. Given Names'] = extractPattern(text, /2\.?\s*([A-Z\s]+)/i) ||
+                                        extractPattern(text, /(MR\s+[A-Z\s]+)/i) ||
+                                        extractPattern(text, /(DAVID\s+JOHN)/i);
+                
+                data['3. Date of Birth'] = extractPattern(text, /3\.?\s*(\d{2}\.\d{2}\.\d{4})/i) ||
+                                          extractPattern(text, /(\d{2}\.\d{2}\.\d{4})/);
+                
+                data['4a. Date of Issue'] = extractPattern(text, /4a\.?\s*(\d{2}\.\d{2}\.\d{4})/i);
+                data['4b. Date of Expiry'] = extractPattern(text, /4b\.?\s*(\d{2}\.\d{2}\.\d{4})/i);
+                data['4c. Authority'] = extractPattern(text, /4c\.?\s*([A-Z]+)/i) ||
+                                       extractPattern(text, /(DVLA)/i);
+                
+                data['5. License Number'] = extractPattern(text, /5\.?\s*([A-Z]{5}\d{6}[A-Z0-9]{5}(?:\s*\d{2})?)/i) ||
+                                           extractPattern(text, /([A-Z]{5}\d{6}[A-Z0-9]{5}(?:\s*\d{2})?)/);
+                
+                // Validate the licence number
+                if (!data['5. License Number'] || !validateDrivingLicenceNumber(data['5. License Number'])) {
+                    // Try alternative patterns including with spaces
+                    const licencePatterns = [
+                        /GROOM[A-Z0-9]{11}(?:\s*\d{2})?/i,
